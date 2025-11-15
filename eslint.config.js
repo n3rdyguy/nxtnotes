@@ -1,5 +1,5 @@
 // eslint.config.js
-import antfu from "@antfu/eslint-config"
+import antfu from "@antfu/eslint-config";
 
 export default antfu({
   // `.eslintignore` is no longer supported in Flat config, use `ignores` instead
@@ -18,8 +18,10 @@ export default antfu({
     indent: 2, // 4, or 'tab'
     quotes: "double",
   },
-
+  rules: {
+    "style/semi": ["error", "always"],
+  },
   // TypeScript and Vue are autodetected, you can also explicitly enable them:
   typescript: true,
   vue: true,
-})
+});

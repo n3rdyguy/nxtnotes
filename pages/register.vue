@@ -1,3 +1,21 @@
+<script setup>
+const email = ref();
+const password = ref();
+
+async function submit() {
+  console.log(email.value);
+  console.log(password.value);
+  const response = await $fetch("/api/user", {
+    method: "POST",
+    body: {
+      email: email.value,
+      password: password.value,
+    },
+  });
+  console.log(response);
+}
+</script>
+
 <template>
   <div class="flex bg-black h-screen">
     <!-- sidebar -->
@@ -9,20 +27,22 @@
       <p class="text-zinc-300 text-sm mt-0.5 mb-12">
         Already registered? <span class="font-bold text-[#FFAC00] underline cursor-pointer">Log in</span> to your account
       </p>
-      <div class="mb-8">
-        <label for="" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-        <input id="" placeholder="your@email.com" type="email" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
-      </div>
-      <div class="mb-8">
-        <label for="" class="text-zinc-300 text-sm block mb-0.5">Password</label>
-        <input id="" placeholder="**********************" type="password" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
-      </div>
-      <div>
-        <button class="flex justify-center gap-2 items-center w-full bg-[#FFAC00] rounded-full px-4 py-2">
-          Sign Up
-          <ArrowRight />
-        </button>
-      </div>
+      <form @submit.prevent="submit">
+        <div class="mb-8">
+          <label for="" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
+          <input v-model="email" placeholder="your@email.com" type="email" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+        </div>
+        <div class="mb-8">
+          <label for="" class="text-zinc-300 text-sm block mb-0.5">Password</label>
+          <input v-model="password" placeholder="**********************" type="password" name="password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+        </div>
+        <div>
+          <button class="flex justify-center gap-2 items-center w-full bg-[#FFAC00] rounded-full px-4 py-2">
+            Sign Up
+            <ArrowRight />
+          </button>
+        </div>
+      </form>
     </div>
     <!-- end sidebar -->
     <!-- note intro -->
