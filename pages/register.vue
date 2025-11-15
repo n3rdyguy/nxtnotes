@@ -13,13 +13,16 @@ async function submit() {
         password: password.value,
       },
     });
-    Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: "Success!",
       text: "User created successfully!",
       icon: "success",
       confirmButtonText: "Log me in",
       theme: "auto",
     });
+    if (isConfirmed) {
+      navigateTo("/");
+    }
   }
   catch (error) {
     Swal.fire({
@@ -47,11 +50,11 @@ async function submit() {
       <form @submit.prevent="submit">
         <div class="mb-8">
           <label for="email" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-          <input v-model="email" placeholder="your@email.com" type="text" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <input v-model="email" placeholder="your@email.com" type="text" name="email" autocomplete="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div class="mb-8">
           <label for="password" class="text-zinc-300 text-sm block mb-0.5">Password</label>
-          <input v-model="password" placeholder="**********************" type="password" name="password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <input v-model="password" placeholder="**********************" type="password" name="password" autocomplete="current-password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div>
           <button class="flex justify-center gap-2 items-center w-full bg-[#FFAC00] rounded-full px-4 py-2">

@@ -1,6 +1,7 @@
 // /api/user
 import bcryptjs from "bcryptjs";
 import { createError, defineEventHandler, readBody } from "h3";
+import jwt from "jsonwebtoken";
 import Validator from "validatorjs";
 import prisma from "~/lib/prisma";
 
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     Validator.register("strongPassword", (value) => {
-      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/.test(value);
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(value);
     }, "Password must include uppercase, lowercase and number");
     const data = {
       email: body.email,
@@ -43,7 +44,12 @@ export default defineEventHandler(async (event) => {
         salt: pwdSalt,
       },
     });
-    return { data: user };
+
+    // eslint-disable-next-line node/prefer-global/process
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    setCookie(event, "jwtToken", token);
+
+    return { data: { token } };
   }
   catch (error) {
     if (error.code === "P2002") {
