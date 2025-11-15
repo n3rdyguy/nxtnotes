@@ -1,18 +1,35 @@
 <script setup>
+import Swal from "sweetalert2";
+
 const email = ref();
 const password = ref();
 
 async function submit() {
-  console.log(email.value);
-  console.log(password.value);
-  const response = await $fetch("/api/user", {
-    method: "POST",
-    body: {
-      email: email.value,
-      password: password.value,
-    },
-  });
-  console.log(response);
+  try {
+    await $fetch("/api/user", {
+      method: "POST",
+      body: {
+        email: email.value,
+        password: password.value,
+      },
+    });
+    Swal.fire({
+      title: "Success!",
+      text: "User created successfully!",
+      icon: "success",
+      confirmButtonText: "Log me in",
+      theme: "auto",
+    });
+  }
+  catch (error) {
+    Swal.fire({
+      title: "Error!",
+      text: error.response?._data.message,
+      icon: "error",
+      confirmButtonText: "OK",
+      theme: "auto",
+    });
+  }
 }
 </script>
 
@@ -29,11 +46,11 @@ async function submit() {
       </p>
       <form @submit.prevent="submit">
         <div class="mb-8">
-          <label for="" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-          <input v-model="email" placeholder="your@email.com" type="email" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <label for="email" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
+          <input v-model="email" placeholder="your@email.com" type="text" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div class="mb-8">
-          <label for="" class="text-zinc-300 text-sm block mb-0.5">Password</label>
+          <label for="password" class="text-zinc-300 text-sm block mb-0.5">Password</label>
           <input v-model="password" placeholder="**********************" type="password" name="password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div>

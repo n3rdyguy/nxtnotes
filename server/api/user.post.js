@@ -1,29 +1,43 @@
 // /api/user
 import bcryptjs from "bcryptjs";
+import { createError, defineEventHandler, readBody } from "h3";
+import Validator from "validatorjs";
 import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    // const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
-    // // console.log("Existing user:", existingUser);
-    // if (existingUser) {
-    //   console.log("User already exists");
-    //   return { user: existingUser };
-    // }
-    // console.log("Creating new user");
-    // console.log(`hashing password: ${body.password}`);
 
+    Validator.register("strongPassword", (value) => {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/.test(value);
+    }, "Password must include uppercase, lowercase and number");
+    const data = {
+      email: body.email,
+      password: body.password,
+    };
+    const rules = {
+      email: "required|email",
+      password: "required|min:8|strongPassword",
+    };
+    const validation = new Validator(data, rules);
+    if (validation.fails()) { // must be called first, to start validation
+      if (validation.errors.has("email")) {
+        throw createError({
+          statusCode: 400,
+          message: validation.errors.first("email"),
+        });
+      }
+      if (validation.errors.has("password")) {
+        throw createError({
+          statusCode: 400,
+          message: validation.errors.first("password"),
+        });
+      }
+    }
     const pwdSalt = await bcryptjs.genSalt(10);
     const pwdHash = await bcryptjs.hash(body.password, pwdSalt);
-    // console.log(await bcryptjs.compare(body.password, hash)); // true
-    // console.log(await bcryptjs.compare("not_bacon", hash)); // false
-    // console.log(`Password hashed: ${hash}`);
-
-    const user = await prisma.user.upsert({
-      where: { email: body.email },
-      update: { /* optional updates */ },
-      create: {
+    const user = await prisma.user.create({
+      data: {
         email: body.email,
         password: pwdHash,
         salt: pwdSalt,
@@ -32,7 +46,15 @@ export default defineEventHandler(async (event) => {
     return { data: user };
   }
   catch (error) {
-    console.error("Error in /api/user POST:", error.code, error.message || error);
-    return { error: "Internal server error" };
+    if (error.code === "P2002") {
+      throw createError({
+        statusCode: 409,
+        message: "User with this email already exists",
+      });
+    }
+    throw createError({
+      code: error.code || 500,
+      message: error.message,
+    });
   }
 });
