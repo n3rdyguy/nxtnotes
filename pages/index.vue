@@ -4,7 +4,8 @@ definePageMeta({
 });
 
 const notes = ref([]);
-const selectedNote = ref([]);
+const selectedNote = ref("");
+const updatedNote = ref("");
 const todaysNotes = computed(() => {
   return notes.value.filter((note) => {
     const noteDate = new Date(note.updated_at);
@@ -27,13 +28,30 @@ const earlierNotes = computed(() => {
     return noteDate < yesterday && noteDate.toDateString() !== yesterday.toDateString();
   });
 });
+async function updateNote() {
+  try {
+    // console.log(`/api/notes/${selectedNote.value.id}`);
+    await $fetch(`/api/notes/${selectedNote.value.id}`, {
+      method: "PATCH",
+      body: {
+        updatedNote: updatedNote.value.slice(0, 65535),
+      },
+    });
+  }
+  catch (error) {
+    console.log(error.message);
+  }
+}
+function selectNote(note) {
+
+}
 onMounted(async () => {
   notes.value = await $fetch("/api/notes");
 
   if (notes.value.length > 0) {
     selectedNote.value = notes.value[0];
   }
-  console.log(todaysNotes.value);
+  updatedNote.value = selectedNote.value.text;
 });
 </script>
 
@@ -138,7 +156,7 @@ onMounted(async () => {
     </div>
     <!-- /sidebar -->
     <!-- button container -->
-    <div class="w-full">
+    <div class="w-full flex flex-col">
       <div class="flex justify-between w-full items-start p-8">
         <button class="inline-flex text-sx text-[#C2C2C5] hover:text-white items-center gap-2">
           <PencilIcon />
@@ -150,13 +168,16 @@ onMounted(async () => {
       </div>
       <!-- /button container -->
       <!-- note container -->
-      <div class="max-w-[437px] mx-auto">
+      <div class="max-w-[437px] mx-auto w-full flex-grow flex flex-col">
         <p class="text-[#929292] playfair">
-          {{ new Date(selectedNote.updated_at).toLocaleDateString() }}
+          {{ selectedNote.updated_at ? new Date(selectedNote.updated_at).toLocaleDateString() : new Date().toLocaleDateString() }}
         </p>
-        <p class="text-[#D4D4D4] my-4 playfair note">
-          {{ selectedNote.text }}
-        </p>
+        <textarea
+          id="note"
+          v-model="updatedNote" maxlength="65535" name="note"
+          class="text-[#D4D4D4] my-4 playfair note w-full bg-transparent focus:outline-none resize-none flex-grow"
+          @input="updateNote"
+        />
       </div>
     </div>
     <!-- /note container -->
@@ -167,4 +188,20 @@ onMounted(async () => {
 .note {
   white-space: pre-line; /* Preserves newlines, collapses multiple spaces */
 }
+.note::-webkit-scrollbar {
+  width: 6px; /* Slimmer width */
+}
+
+.note::-webkit-scrollbar-track {
+  background: #333; /* Dark track */
+}
+
+.note::-webkit-scrollbar-thumb {
+  background: #555; /* Darker thumb */
+  border-radius: 3px;
+}
+
+.note::-webkit-scrollbar-thumb:hover {
+  background: #666; /* Even darker on hover */
+  }
 </style>
