@@ -1,6 +1,5 @@
 // /api/login
 import bcryptjs from "bcryptjs";
-import { createError, defineEventHandler, readBody } from "h3";
 import jwt from "jsonwebtoken";
 import Validator from "validatorjs";
 import prisma from "~/lib/prisma";
@@ -50,7 +49,7 @@ export default defineEventHandler(async (event) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     setCookie(event, "jwtToken", token);
 
-    return { data: 'success' };
+    return { data: "success" };
   }
   catch (error) {
     // catch all errors here

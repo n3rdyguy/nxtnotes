@@ -7,6 +7,7 @@ interface Note {
   text: string
   updated_at: string
 }
+const noteTextarea = ref<HTMLTextAreaElement | null>(null);
 const notes = ref<Note[]>([]);
 const selectedNote = ref<Note | null>(null);
 const updatedNote = ref("");
@@ -60,6 +61,44 @@ function selectNote(note: Note) {
   selectedNote.value = note;
   updatedNote.value = note.text;
 }
+async function createNewNote() {
+  try {
+    const newNote = await $fetch<Note>("/api/notes", {
+      method: "POST",
+    });
+    notes.value.unshift(newNote);
+    selectedNote.value = newNote;
+    updatedNote.value = "";
+  }
+  catch (error: any) {
+    throw createError({
+      statusCode: Number(error.statusCode) || 500,
+      statusMessage: String(error.message),
+    });
+  }
+}
+async function deleteNote() {
+  try {
+    const deletedNote = await $fetch<Note>(`/api/notes/${selectedNote.value?.id}`, {
+      method: "DELETE",
+    });
+    console.log("Deleted note: ", deletedNote);
+    notes.value = notes.value.filter(note => note.id !== deletedNote.id);
+    // notes.value.unshift(newNote);
+    // selectedNote.value = newNote;
+    // updatedNote.value = "";
+  }
+  catch (error: any) {
+    throw createError({
+      statusCode: Number(error.statusCode) || 500,
+      statusMessage: String(error.message),
+    });
+  }
+}
+function logout() {
+  useCookie("jwtToken").value = null;
+  return navigateTo("/login");
+}
 onMounted(async () => {
   notes.value = await $fetch<Note[]>("/api/notes");
 
@@ -67,14 +106,26 @@ onMounted(async () => {
     selectedNote.value = notes.value[0];
     updatedNote.value = selectedNote.value.text;
   }
+  else {
+    await createNewNote();
+    selectedNote.value = notes.value[0];
+  }
+  nextTick(() => {
+    noteTextarea.value?.focus();
+  });
+  watch(updatedNote, () => {
+    nextTick(() => {
+      noteTextarea.value?.focus();
+    });
+  });
 });
 </script>
 
 <template>
   <div class="flex bg-zinc-900 min-h-screen">
     <!-- sidebar -->
-    <div class="bg-black w-[338px] p-8">
-      <Logo />
+    <div class="bg-black w-[338px] p-8 flex flex-col h-screen overflow-y-auto scrollbar">
+      <div><Logo /></div>
       <!-- today container -->
       <div>
         <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
@@ -95,12 +146,9 @@ onMounted(async () => {
             </h3>
             <div class="leading-none text-[#C2C2C5] truncate">
               <span class="text-xs text-[#F4F4F5] mr-4">
-                {{ new Date(note.updated_at).toDateString()
-                  === new Date().toDateString()
-                  ? 'Today'
-                  : new Date(note.updated_at).toLocaleDateString() }}
+                {{ new Date().toLocaleDateString() }}
               </span>
-              <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
+              <span v-if="note.text.length > 40" class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -126,12 +174,9 @@ onMounted(async () => {
             </h3>
             <div class="leading-none text-[#C2C2C5] truncate">
               <span class="text-xs text-[#F4F4F5] mr-4">
-                {{ new Date(note.updated_at).toDateString()
-                  === new Date().toDateString()
-                  ? 'Today'
-                  : new Date(note.updated_at).toLocaleDateString() }}
+                {{ new Date(note.updated_at).toLocaleDateString() }}
               </span>
-              <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
+              <span v-if="note.text.length > 40" class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -157,10 +202,7 @@ onMounted(async () => {
             </h3>
             <div class="leading-none text-[#C2C2C5] truncate">
               <span class="text-xs text-[#F4F4F5] mr-4">
-                {{ new Date(note.updated_at).toDateString()
-                  === new Date().toDateString()
-                  ? 'Today'
-                  : new Date(note.updated_at).toLocaleDateString() }}
+                {{ new Date(note.updated_at).toLocaleDateString() }}
               </span>
               <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
             </div>
@@ -173,11 +215,14 @@ onMounted(async () => {
     <!-- button container -->
     <div class="w-full flex flex-col">
       <div class="flex justify-between w-full items-start p-8">
-        <button class="inline-flex text-sx text-[#C2C2C5] hover:text-white items-center gap-2">
+        <button
+          class="inline-flex text-sx text-[#C2C2C5] hover:text-white items-center gap-2"
+          @click="createNewNote"
+        >
           <PencilIcon />
           Create note
         </button>
-        <button class="text-[#6D6D73] hover:text-white" @click="selectedNote = null; updatedNote = ''">
+        <button class="text-[#6D6D73] hover:text-white" @click="deleteNote">
           <TrashIcon />
         </button>
       </div>
@@ -189,11 +234,15 @@ onMounted(async () => {
         </p>
         <textarea
           id="note"
+          ref="noteTextarea"
           v-model="updatedNote" maxlength="65535" name="note"
-          class="text-[#D4D4D4] my-4 playfair note w-full bg-transparent focus:outline-none resize-none flex-grow"
+          class="text-[#D4D4D4] my-4 playfair note scrollbar w-full bg-transparent focus:outline-none resize-none flex-grow"
           @input="debouncedUpdateNote"
         />
       </div>
+      <button class="text-zinc-400 hover:text-white text-sm font-bold absolute right-5 bottom-5" @click="logout">
+        Log Out
+      </button>
     </div>
     <!-- /note container -->
   </div>
@@ -203,20 +252,20 @@ onMounted(async () => {
 .note {
   white-space: pre-line; /* Preserves newlines, collapses multiple spaces */
 }
-.note::-webkit-scrollbar {
+.scrollbar::-webkit-scrollbar {
   width: 6px; /* Slimmer width */
 }
 
-.note::-webkit-scrollbar-track {
+.scrollbar::-webkit-scrollbar-track {
   background: #333; /* Dark track */
 }
 
-.note::-webkit-scrollbar-thumb {
+.scrollbar::-webkit-scrollbar-thumb {
   background: #555; /* Darker thumb */
   border-radius: 3px;
 }
 
-.note::-webkit-scrollbar-thumb:hover {
+.scrollbar::-webkit-scrollbar-thumb:hover {
   background: #666; /* Even darker on hover */
-  }
+}
 </style>
