@@ -19,4 +19,12 @@ model User {
   password   String
   salt       String
   created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+}
+
+model Notes {
+  id         Int      @id @default(autoincrement())
+  text       String   @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 }
