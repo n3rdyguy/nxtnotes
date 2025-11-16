@@ -13,6 +13,6 @@ export default defineNuxtRouteMiddleware(async () => {
   }
   // eslint-disable-next-line unused-imports/no-unused-vars
   catch (error) {
-    return navigateTo("/register");
+    return navigateTo("/login");
   }
 });
