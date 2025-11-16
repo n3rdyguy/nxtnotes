@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       });
     }
     const body = await readBody(event);
-    console.log("Body id:", event.context.params.id);
+    // console.log("Body id:", event.context.params.id);
     await prisma.notes.update({
       where: {
         id: Number(event.context.params.id),
@@ -25,6 +25,9 @@ export default defineEventHandler(async (event) => {
     });
   }
   catch (error) {
-    console.log("Error in notes/id.patch.js:", error);
+    throw createError({
+      statusCode: Number(error.statusCode) || 500,
+      statusMessage: String(error.message),
+    });
   }
 });

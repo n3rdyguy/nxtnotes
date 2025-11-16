@@ -2,9 +2,13 @@
 definePageMeta({
   middleware: ["auth"],
 });
-
-const notes = ref([]);
-const selectedNote = ref(null);
+interface Note {
+  id: number
+  text: string
+  updated_at: string
+}
+const notes = ref<Note[]>([]);
+const selectedNote = ref<Note | null>(null);
 const updatedNote = ref("");
 const todaysNotes = computed(() => {
   return notes.value.filter((note) => {
@@ -29,6 +33,9 @@ const earlierNotes = computed(() => {
   });
 });
 async function updateNote() {
+  if (!selectedNote.value) {
+    return;
+  }
   try {
     await $fetch(`/api/notes/${selectedNote.value.id}`, {
       method: "PATCH",
@@ -38,16 +45,19 @@ async function updateNote() {
     });
     selectedNote.value.text = updatedNote.value;
   }
-  catch (error) {
-    console.log(error.message);
+  catch (error: any) {
+    throw createError({
+      statusCode: Number(error.statusCode) || 500,
+      statusMessage: String(error.message),
+    });
   }
 }
-function selectNote(note) {
+function selectNote(note: Note) {
   selectedNote.value = note;
   updatedNote.value = note.text;
 }
 onMounted(async () => {
-  notes.value = await $fetch("/api/notes");
+  notes.value = await $fetch<Note[]>("/api/notes");
 
   if (notes.value.length > 0) {
     selectedNote.value = notes.value[0];
