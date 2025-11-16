@@ -14,6 +14,19 @@ export default defineEventHandler(async (event) => {
       });
     }
     const body = await readBody(event);
+    // console.log("note_id: ", event.context.params.id, " decoded id:", decoded.id);
+    const noteTryingToUpdate = await prisma.notes.findFirst({
+      where: {
+        id: Number(event.context.params.id),
+        user_id: decoded.id,
+      },
+    }); // verify user owns the note
+    if (!noteTryingToUpdate) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden to update note",
+      });
+    }
     // console.log("Body id:", event.context.params.id);
     await prisma.notes.update({
       where: {
