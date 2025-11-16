@@ -2,9 +2,14 @@
 definePageMeta({
   middleware: ["auth"],
 });
-
-const notes = ref([]);
-const selectedNote = ref([]);
+interface Note {
+  id: number
+  text: string
+  updated_at: string
+}
+const notes = ref<Note[]>([]);
+const selectedNote = ref<Note | null>(null);
+const updatedNote = ref("");
 const todaysNotes = computed(() => {
   return notes.value.filter((note) => {
     const noteDate = new Date(note.updated_at);
@@ -24,16 +29,40 @@ const earlierNotes = computed(() => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const noteDate = new Date(note.updated_at);
-    return noteDate < yesterday && noteDate.toDateString() !== yesterday.toDateString();
+    return noteDate.toDateString() < yesterday.toDateString();
   });
 });
+async function updateNote() {
+  if (!selectedNote.value) {
+    return;
+  }
+  try {
+    await $fetch(`/api/notes/${selectedNote.value.id}`, {
+      method: "PATCH",
+      body: {
+        updatedNote: updatedNote.value.slice(0, 65535),
+      },
+    });
+    selectedNote.value.text = updatedNote.value;
+  }
+  catch (error: any) {
+    throw createError({
+      statusCode: Number(error.statusCode) || 500,
+      statusMessage: String(error.message),
+    });
+  }
+}
+function selectNote(note: Note) {
+  selectedNote.value = note;
+  updatedNote.value = note.text;
+}
 onMounted(async () => {
-  notes.value = await $fetch("/api/notes");
+  notes.value = await $fetch<Note[]>("/api/notes");
 
   if (notes.value.length > 0) {
     selectedNote.value = notes.value[0];
+    updatedNote.value = selectedNote.value.text;
   }
-  console.log(todaysNotes.value);
 });
 </script>
 
@@ -51,11 +80,11 @@ onMounted(async () => {
           class="ml-2 space-y-2"
         >
           <div
-            v-for="note in todaysNotes" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
+            v-for="note in todaysNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
+            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
+                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
             }"
-            @click="selectedNote = note"
+            @click="selectNote(note)"
           >
             <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
               {{ note.text.substring(0, 40) }}
@@ -82,11 +111,11 @@ onMounted(async () => {
           class="ml-2 space-y-2"
         >
           <div
-            v-for="note in yesterdaysNotes" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
+            v-for="note in yesterdaysNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
+            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
+                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
             }"
-            @click="selectedNote = note"
+            @click="selectNote(note)"
           >
             <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
               {{ note.text.substring(0, 40) }}
@@ -113,11 +142,11 @@ onMounted(async () => {
           class="ml-2 space-y-2"
         >
           <div
-            v-for="note in earlierNotes" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
+            v-for="note in earlierNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
+            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
+                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
             }"
-            @click="selectedNote = note"
+            @click="selectNote(note)"
           >
             <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
               {{ note.text.substring(0, 40) }}
@@ -138,25 +167,28 @@ onMounted(async () => {
     </div>
     <!-- /sidebar -->
     <!-- button container -->
-    <div class="w-full">
+    <div class="w-full flex flex-col">
       <div class="flex justify-between w-full items-start p-8">
         <button class="inline-flex text-sx text-[#C2C2C5] hover:text-white items-center gap-2">
           <PencilIcon />
           Create note
         </button>
-        <button class="text-[#6D6D73] hover:text-white">
+        <button class="text-[#6D6D73] hover:text-white" @click="selectedNote = null; updatedNote = ''">
           <TrashIcon />
         </button>
       </div>
       <!-- /button container -->
       <!-- note container -->
-      <div class="max-w-[437px] mx-auto">
+      <div class="max-w-[437px] mx-auto w-full flex-grow flex flex-col">
         <p class="text-[#929292] playfair">
-          {{ new Date(selectedNote.updated_at).toLocaleDateString() }}
+          {{ selectedNote?.updated_at ? new Date(selectedNote.updated_at).toLocaleDateString() : new Date().toLocaleDateString() }}
         </p>
-        <p class="text-[#D4D4D4] my-4 playfair note">
-          {{ selectedNote.text }}
-        </p>
+        <textarea
+          id="note"
+          v-model="updatedNote" maxlength="65535" name="note"
+          class="text-[#D4D4D4] my-4 playfair note w-full bg-transparent focus:outline-none resize-none flex-grow"
+          @input="updateNote"
+        />
       </div>
     </div>
     <!-- /note container -->
@@ -167,4 +199,20 @@ onMounted(async () => {
 .note {
   white-space: pre-line; /* Preserves newlines, collapses multiple spaces */
 }
+.note::-webkit-scrollbar {
+  width: 6px; /* Slimmer width */
+}
+
+.note::-webkit-scrollbar-track {
+  background: #333; /* Dark track */
+}
+
+.note::-webkit-scrollbar-thumb {
+  background: #555; /* Darker thumb */
+  border-radius: 3px;
+}
+
+.note::-webkit-scrollbar-thumb:hover {
+  background: #666; /* Even darker on hover */
+  }
 </style>
