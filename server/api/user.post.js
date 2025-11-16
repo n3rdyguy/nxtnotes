@@ -48,8 +48,7 @@ export default defineEventHandler(async (event) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     setCookie(event, "jwtToken", token);
 
-    // TODO: remove token from response body
-    return { data: { token } };
+    return { data: "success" };
   }
   catch (error) {
     if (error.code === "P2002") {
