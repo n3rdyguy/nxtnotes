@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import prisma from "~/lib/prisma";
+// import prisma from "~/lib/prisma";
 
 definePageMeta({
   middleware: ["auth"],

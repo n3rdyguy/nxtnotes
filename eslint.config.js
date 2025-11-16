@@ -20,6 +20,8 @@ export default antfu({
   },
   rules: {
     "style/semi": ["error", "always"],
+    "node/prefer-global/process": ["off", "never"],
+    "no-undef": ["off", "never"],
   },
   // TypeScript and Vue are autodetected, you can also explicitly enable them:
   typescript: true,

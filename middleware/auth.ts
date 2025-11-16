@@ -1,5 +1,4 @@
-/* eslint-disable node/prefer-global/process */
-export default defineNuxtRouteMiddleware(async (event) => {
+export default defineNuxtRouteMiddleware(async () => {
   // We do not want this to run on client
   if (process.client) {
     return;

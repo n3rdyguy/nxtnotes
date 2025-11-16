@@ -45,7 +45,6 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // eslint-disable-next-line node/prefer-global/process
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     setCookie(event, "jwtToken", token);
 
