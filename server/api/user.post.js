@@ -1,6 +1,7 @@
 // /api/user
 import bcryptjs from "bcryptjs";
 import { createError, defineEventHandler, readBody } from "h3";
+import jwt from "jsonwebtoken";
 import Validator from "validatorjs";
 import prisma from "~/lib/prisma";
 
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     Validator.register("strongPassword", (value) => {
-      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/.test(value);
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(String(value));
     }, "Password must include uppercase, lowercase and number");
     const data = {
       email: body.email,
@@ -24,13 +25,13 @@ export default defineEventHandler(async (event) => {
       if (validation.errors.has("email")) {
         throw createError({
           statusCode: 400,
-          message: validation.errors.first("email"),
+          message: String(validation.errors.first("email")),
         });
       }
       if (validation.errors.has("password")) {
         throw createError({
           statusCode: 400,
-          message: validation.errors.first("password"),
+          message: String(validation.errors.first("password")),
         });
       }
     }
@@ -43,7 +44,12 @@ export default defineEventHandler(async (event) => {
         salt: pwdSalt,
       },
     });
-    return { data: user };
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    setCookie(event, "jwtToken", token);
+
+    // TODO: remove token from response body
+    return { data: { token } };
   }
   catch (error) {
     if (error.code === "P2002") {
@@ -52,8 +58,9 @@ export default defineEventHandler(async (event) => {
         message: "User with this email already exists",
       });
     }
+    // catch all errors here
     throw createError({
-      code: error.code || 500,
+      statusCode: error.statusCode || 500,
       message: error.message,
     });
   }

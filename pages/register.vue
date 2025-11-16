@@ -13,13 +13,16 @@ async function submit() {
         password: password.value,
       },
     });
-    Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: "Success!",
       text: "User created successfully!",
       icon: "success",
       confirmButtonText: "Log me in",
       theme: "auto",
     });
+    if (isConfirmed) {
+      navigateTo("/");
+    }
   }
   catch (error) {
     Swal.fire({
@@ -42,16 +45,19 @@ async function submit() {
         Sign up for a free account
       </h1>
       <p class="text-zinc-300 text-sm mt-0.5 mb-12">
-        Already registered? <span class="font-bold text-[#FFAC00] underline cursor-pointer">Log in</span> to your account
+        Already registered?
+        <NuxtLink to="/login">
+          <span class="font-bold text-[#FFAC00] underline cursor-pointer">Log in</span> to your account
+        </NuxtLink>
       </p>
       <form @submit.prevent="submit">
         <div class="mb-8">
           <label for="email" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-          <input v-model="email" placeholder="your@email.com" type="text" name="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <input id="email" v-model="email" type="email" name="email" autocomplete="email" placeholder="your@email.com" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div class="mb-8">
           <label for="password" class="text-zinc-300 text-sm block mb-0.5">Password</label>
-          <input v-model="password" placeholder="**********************" type="password" name="password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <input id="password" v-model="password" type="password" name="password" autocomplete="current-password" placeholder="**********************" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div>
           <button class="flex justify-center gap-2 items-center w-full bg-[#FFAC00] rounded-full px-4 py-2">
@@ -63,6 +69,6 @@ async function submit() {
     </div>
     <!-- end sidebar -->
     <!-- note intro -->
-    <!-- end note intro -->
+    <!-- /note intro -->
   </div>
 </template>

@@ -16,6 +16,7 @@
     "@prisma/client": "^6.19.0",
     "@prisma/nuxt": "0.3.0",
     "bcryptjs": "2.4.3",
+    "jsonwebtoken": "^9.0.2",
     "nuxt": "3.20.1",
     "sweetalert2": "^11.26.3",
     "validatorjs": "^3.22.1",
@@ -24,6 +25,10 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "6.2.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.1",
+    "@types/validatorjs": "^3.15.5",
     "autoprefixer": "10.4.20",
     "eslint": "9.39.1",
     "postcss": "8.4.9",
