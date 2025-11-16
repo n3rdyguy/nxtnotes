@@ -52,6 +52,10 @@ async function updateNote() {
     });
   }
 }
+const debouncedUpdateNote = useDebounceFn(async () => {
+  await updateNote();
+  // console.log("Note updated: ", selectedNote.value?.id);
+}, 500);
 function selectNote(note: Note) {
   selectedNote.value = note;
   updatedNote.value = note.text;
@@ -187,7 +191,7 @@ onMounted(async () => {
           id="note"
           v-model="updatedNote" maxlength="65535" name="note"
           class="text-[#D4D4D4] my-4 playfair note w-full bg-transparent focus:outline-none resize-none flex-grow"
-          @input="updateNote"
+          @input="debouncedUpdateNote"
         />
       </div>
     </div>

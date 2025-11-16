@@ -10,7 +10,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: ["@prisma/nuxt", "@nuxt/eslint"],
+  modules: ["@prisma/nuxt", "@nuxt/eslint", "@vueuse/nuxt"],
 
   app: {
     baseURL: "/", // Ensures default base URL
