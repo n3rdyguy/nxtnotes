@@ -1,21 +1,39 @@
 <script setup lang="ts">
-import PencilIcon from "~/components/PencilIcon.vue";
-
-// import prisma from "~/lib/prisma";
-
 definePageMeta({
   middleware: ["auth"],
 });
 
 const notes = ref([]);
 const selectedNote = ref([]);
-
+const todaysNotes = computed(() => {
+  return notes.value.filter((note) => {
+    const noteDate = new Date(note.updated_at);
+    return noteDate.toDateString() === new Date().toDateString();
+  });
+});
+const yesterdaysNotes = computed(() => {
+  return notes.value.filter((note) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const noteDate = new Date(note.updated_at);
+    return noteDate.toDateString() === yesterday.toDateString();
+  });
+});
+const earlierNotes = computed(() => {
+  return notes.value.filter((note) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const noteDate = new Date(note.updated_at);
+    return noteDate < yesterday && noteDate.toDateString() !== yesterday.toDateString();
+  });
+});
 onMounted(async () => {
   notes.value = await $fetch("/api/notes");
 
   if (notes.value.length > 0) {
     selectedNote.value = notes.value[0];
   }
+  console.log(todaysNotes.value);
 });
 </script>
 
@@ -33,7 +51,7 @@ onMounted(async () => {
           class="ml-2 space-y-2"
         >
           <div
-            v-for="note in notes" class="p-2 rounded-lg cursor-pointer"
+            v-for="note in todaysNotes" class="p-2 rounded-lg cursor-pointer"
             :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
                       'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
             }"
@@ -57,17 +75,30 @@ onMounted(async () => {
       <!-- /today container -->
       <!-- yesterday container -->
       <div>
-        <p class="text-sm font-bold text-[#C2C2C5] mt-12 mb-6">
+        <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
           Yesterday
         </p>
-        <div class="ml-2">
-          <div class="p-2">
-            <h3 class="text-sm font-bold text-[#F4F4F5]">
-              Just finished reading...
+        <div
+          class="ml-2 space-y-2"
+        >
+          <div
+            v-for="note in yesterdaysNotes" class="p-2 rounded-lg cursor-pointer"
+            :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
+                      'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
+            }"
+            @click="selectedNote = note"
+          >
+            <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
+              {{ note.text.substring(0, 40) }}
             </h3>
-            <div class="leading-none">
-              <span class="text-xs text-[#F4F4F5] mr-4">Today</span>
-              <span class="text-xs text-[#C2C2C5]">The Midnight Library...</span>
+            <div class="leading-none text-[#C2C2C5] truncate">
+              <span class="text-xs text-[#F4F4F5] mr-4">
+                {{ new Date(note.updated_at).toDateString()
+                  === new Date().toDateString()
+                  ? 'Today'
+                  : new Date(note.updated_at).toLocaleDateString() }}
+              </span>
+              <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -75,17 +106,30 @@ onMounted(async () => {
       <!-- /yesterday container -->
       <!-- past 30 days container -->
       <div>
-        <p class="text-sm font-bold text-[#C2C2C5] mt-12 mb-6">
-          Past 30 Days
+        <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
+          Earlier
         </p>
-        <div class="ml-2">
-          <div class="p-2">
-            <h3 class="text-sm font-bold text-[#F4F4F5]">
-              Just finished reading...
+        <div
+          class="ml-2 space-y-2"
+        >
+          <div
+            v-for="note in earlierNotes" class="p-2 rounded-lg cursor-pointer"
+            :class="{ 'bg-[#A1842C]': selectedNote.id === note.id,
+                      'hover:bg-[#A1842C]/50': selectedNote.id !== note.id,
+            }"
+            @click="selectedNote = note"
+          >
+            <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
+              {{ note.text.substring(0, 40) }}
             </h3>
-            <div class="leading-none">
-              <span class="text-xs text-[#F4F4F5] mr-4">Today</span>
-              <span class="text-xs text-[#C2C2C5]">The Midnight Library...</span>
+            <div class="leading-none text-[#C2C2C5] truncate">
+              <span class="text-xs text-[#F4F4F5] mr-4">
+                {{ new Date(note.updated_at).toDateString()
+                  === new Date().toDateString()
+                  ? 'Today'
+                  : new Date(note.updated_at).toLocaleDateString() }}
+              </span>
+              <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
