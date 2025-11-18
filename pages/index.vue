@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Swal from "sweetalert2";
+
 definePageMeta({
   middleware: ["auth"],
 });
@@ -78,23 +80,67 @@ async function createNewNote() {
   }
 }
 async function deleteNote() {
+  if (!selectedNote.value) {
+    return;
+  }
+
   try {
-    const deletedNote = await $fetch<Note>(`/api/notes/${selectedNote.value?.id}`, {
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Delete Note?",
+      text: "Are you sure you want to delete this note? This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#FFAC00",
+      cancelButtonColor: "#6D6D73",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+    });
+
+    // If user cancels, exit early
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    // Proceed with deletion
+    const deletedNote = await $fetch<Note>(`/api/notes/${selectedNote.value.id}`, {
       method: "DELETE",
     });
-    console.log("Deleted note: ", deletedNote);
+
+    // Remove note from array
     notes.value = notes.value.filter(note => note.id !== deletedNote.id);
-    // notes.value.unshift(newNote);
-    // selectedNote.value = newNote;
-    // updatedNote.value = "";
+
+    // Auto-select the first note (most recent) or create new one if none remain
+    if (notes.value.length > 0) {
+      selectedNote.value = notes.value[0];
+      updatedNote.value = selectedNote.value.text;
+    }
+    else {
+      await createNewNote();
+    }
+
+    // Show success message
+    await Swal.fire({
+      title: "Deleted!",
+      text: "Your note has been deleted.",
+      icon: "success",
+      confirmButtonColor: "#FFAC00",
+      timer: 2000,
+      showConfirmButton: false,
+    });
   }
   catch (error: any) {
-    throw createError({
-      statusCode: Number(error.statusCode) || 500,
-      statusMessage: String(error.message),
+    Swal.fire({
+      title: "Error!",
+      text: error.message || "Failed to delete note",
+      icon: "error",
+      confirmButtonColor: "#FFAC00",
     });
   }
 }
+
+// Throttled version to prevent rapid successive deletions
+const throttledDeleteNote = useThrottleFn(deleteNote, 2000);
 function logout() {
   useCookie("jwtToken").value = null;
   return navigateTo("/login");
@@ -222,7 +268,7 @@ onMounted(async () => {
           <PencilIcon />
           Create note
         </button>
-        <button class="text-[#6D6D73] hover:text-white" @click="deleteNote">
+        <button class="text-[#6D6D73] hover:text-white" @click="throttledDeleteNote">
           <TrashIcon />
         </button>
       </div>
