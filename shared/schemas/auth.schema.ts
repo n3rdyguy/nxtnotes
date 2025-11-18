@@ -26,7 +26,7 @@ export type RegisterInput = z.infer<typeof registerSchema>;
  */
 export const jwtPayloadSchema = z.object({
   id: z.number(),
-  email: z.string().email(),
+  email: emailSchema,
   iat: z.number().optional(),
   exp: z.number().optional(),
 });

@@ -6,7 +6,10 @@ import { z } from "zod";
 export const emailSchema = z
   .string()
   .min(1, "Email is required")
-  .email("Invalid email format");
+  .regex(
+    /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/,
+    "Invalid email format",
+  );
 
 /**
  * Strong password validation schema
