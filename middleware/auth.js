@@ -4,12 +4,12 @@ export default defineNuxtRouteMiddleware(async () => {
     return;
   }
   const { $verifyJwtToken } = useNuxtApp();
-  const jwtToken = useCookie("jwtToken");
-  if (!jwtToken.value) {
+  const accessToken = useCookie("accessToken");
+  if (!accessToken.value) {
     return navigateTo("/register");
   }
   try {
-    await $verifyJwtToken(jwtToken.value, process.env.JWT_SECRET);
+    await $verifyJwtToken(accessToken.value, process.env.JWT_SECRET);
   }
   // eslint-disable-next-line unused-imports/no-unused-vars
   catch (error) {

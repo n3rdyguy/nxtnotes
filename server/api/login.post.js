@@ -3,9 +3,12 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Validator from "validatorjs";
 import prisma from "~/lib/prisma";
+import { generateTokens, rateLimit, setCookieToken } from "~/server/utils/security";
 
 export default defineEventHandler(async (event) => {
   try {
+    rateLimit(event);
+
     const body = await readBody(event);
 
     const data = {
@@ -45,9 +48,21 @@ export default defineEventHandler(async (event) => {
         message: "Invalid credentials",
       });
     }
-    // User is authenticated, generate JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-    setCookie(event, "jwtToken", token);
+
+    // Generate tokens
+    const { accessToken, refreshToken } = generateTokens(user);
+
+    // Store refresh token in DB
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        user_id: user.id,
+      },
+    });
+
+    // Set cookies
+    setCookieToken(event, "accessToken", accessToken);
+    setCookieToken(event, "refreshToken", refreshToken);
 
     return { data: "success" };
   }
@@ -59,3 +74,4 @@ export default defineEventHandler(async (event) => {
     });
   }
 });
+

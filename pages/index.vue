@@ -142,7 +142,8 @@ async function deleteNote() {
 // Throttled version to prevent rapid successive deletions
 const throttledDeleteNote = useThrottleFn(deleteNote, 2000);
 function logout() {
-  useCookie("jwtToken").value = null;
+  useCookie("accessToken").value = null;
+  useCookie("refreshToken").value = null;
   return navigateTo("/login");
 }
 onMounted(async () => {

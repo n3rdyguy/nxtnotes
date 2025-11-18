@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const cookies = parseCookies(event);
-    const token = cookies.jwtToken;
+    const token = cookies.accessToken;
     const decoded = token ? jwt.verify(token, process.env.JWT_SECRET) : null;
     if (!token || !decoded) {
       throw createError({
