@@ -6,7 +6,7 @@ export default defineEventHandler((event) => {
   const excludedPaths = ["/api/login", "/api/user", "/api/refresh", "/api/csrf"];
   const isExcluded = excludedPaths.some(excluded => path?.startsWith(excluded));
 
-  if (["POST", "PUT", "DELETE", "PATCH"].includes(method) && !isExcluded) {
+  if (["POST", "PUT", "DELETE", "PATCH"].includes(method ?? "") && !isExcluded) {
     const csrfCookie = getCookie(event, "csrf_token");
     const csrfHeader = getHeader(event, "X-CSRF-Token");
 

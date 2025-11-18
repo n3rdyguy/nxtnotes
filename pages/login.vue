@@ -53,7 +53,7 @@ async function submit() {
       <form @submit.prevent="submit">
         <div class="mb-8">
           <label for="email" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-          <input id="email" v-model="email" placeholder="your@email.com" type="email" name="email" autocomplete="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <input id="email" v-model="email" placeholder="your@email.com" type="text" name="email" autocomplete="text" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div class="mb-8">
           <label for="password" class="text-zinc-300 text-sm block mb-0.5">Password</label>

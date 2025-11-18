@@ -1,6 +1,9 @@
+import type { JwtPayload } from "~/shared/schemas/auth.schema";
 import jwt from "jsonwebtoken";
 import prisma from "~/lib/prisma";
+import { env } from "~/server/utils/env";
 import { generateTokens, setCookieToken } from "~/server/utils/security";
+import { jwtPayloadSchema } from "~/shared/schemas/auth.schema";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -15,9 +18,10 @@ export default defineEventHandler(async (event) => {
     }
 
     // Verify refresh token
-    let decoded;
+    let decoded: JwtPayload;
     try {
-      decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      const rawDecoded = jwt.verify(refreshToken, env.JWT_SECRET);
+      decoded = jwtPayloadSchema.parse(rawDecoded);
     }
     catch {
       throw createError({
@@ -61,9 +65,13 @@ export default defineEventHandler(async (event) => {
 
     return { data: "success" };
   }
-  catch (error) {
+  catch (error: any) {
+    // Re-throw if already an H3Error
+    if (error.statusCode) {
+      throw error;
+    }
     throw createError({
-      statusCode: error.statusCode || 500,
+      statusCode: 500,
       message: error.message || "Failed to refresh token",
     });
   }

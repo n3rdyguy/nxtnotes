@@ -34,10 +34,9 @@ export default defineNuxtPlugin(async () => {
           await originalFetch("/api/refresh", { method: "POST" });
 
           // Retry the original request
-          // @ts-ignore - Type compatibility issue with options
           return await originalFetch(request);
         }
-        catch (refreshError) {
+        catch {
           // Refresh failed, redirect to login
           if (process.client) {
             navigateTo("/login");
