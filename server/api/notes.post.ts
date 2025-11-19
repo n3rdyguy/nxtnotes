@@ -1,38 +1,15 @@
-import type { JwtPayload } from "~~/shared/schemas/auth.schema";
-import jwt from "jsonwebtoken";
 import prisma from "~~/lib/prisma";
-import { env } from "~~/server/utils/env";
-import { jwtPayloadSchema } from "~~/shared/schemas/auth.schema";
+import { getSession } from "~~/server/utils/security";
 
 export default defineEventHandler(async (event) => {
   try {
-    const cookies = parseCookies(event);
-    const token = cookies.accessToken;
-
-    if (!token) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
-
-    // Verify and validate JWT
-    let decoded: JwtPayload;
-    try {
-      const rawDecoded = jwt.verify(token, env.JWT_SECRET);
-      decoded = jwtPayloadSchema.parse(rawDecoded);
-    }
-    catch {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
+    // Get session from BetterAuth
+    const session = await getSession(event);
 
     // Create new note
     const newNote = await prisma.notes.create({
       data: {
-        user_id: decoded.id,
+        user_id: session.user.id,
         text: "",
       },
     });

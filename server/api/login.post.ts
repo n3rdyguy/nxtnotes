@@ -1,6 +1,5 @@
-import bcryptjs from "bcryptjs";
-import prisma from "~~/lib/prisma";
-import { generateTokens, rateLimit, setCookieToken } from "~~/server/utils/security";
+import { auth } from "~~/lib/auth";
+import { rateLimit } from "~~/server/utils/security";
 import { validateBody } from "~~/server/utils/validation";
 import { loginSchema } from "~~/shared/schemas/auth.schema";
 
@@ -11,34 +10,37 @@ export default defineEventHandler(async (event) => {
     // Validate request body with Zod
     const { email, password } = await validateBody(event, loginSchema);
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email },
+    // Use BetterAuth to sign in
+    const response = await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+      },
+      asResponse: true,
+      headers: getRequestHeaders(event) as unknown as HeadersInit,
     });
 
-    // Verify password
-    const isValid = await bcryptjs.compare(password, user?.password ?? "");
-    if (!isValid || !user) {
-      throw createError({
-        statusCode: 401,
-        message: "Invalid credentials",
-      });
+    // Forward Set-Cookie headers
+    if (response.headers.getSetCookie) {
+      const cookies = response.headers.getSetCookie();
+      for (const cookie of cookies) {
+        appendResponseHeader(event, "set-cookie", cookie);
+      }
+    }
+    else {
+      const cookie = response.headers.get("set-cookie");
+      if (cookie) {
+        appendResponseHeader(event, "set-cookie", cookie);
+      }
     }
 
-    // Generate tokens
-    const { accessToken, refreshToken } = generateTokens(user);
-
-    // Store refresh token in DB
-    await prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        user_id: user.id,
-      },
-    });
-
-    // Set cookies
-    setCookieToken(event, "accessToken", accessToken);
-    setCookieToken(event, "refreshToken", refreshToken);
+    if (!response.ok) {
+      const error = await response.json();
+      throw createError({
+        statusCode: response.status,
+        message: error.message || "Invalid credentials",
+      });
+    }
 
     return { data: "success" };
   }

@@ -1,16 +1,5 @@
 import type { H3Event } from "h3";
-import jwt from "jsonwebtoken";
-import { env } from "./env";
-
-interface User {
-  id: number
-  email: string
-}
-
-interface TokenPair {
-  accessToken: string
-  refreshToken: string
-}
+import { auth } from "~~/lib/auth";
 
 interface RateLimitData {
   count: number
@@ -18,34 +7,21 @@ interface RateLimitData {
 }
 
 /**
- * Generate access and refresh tokens for a user
+ * Get the current session from BetterAuth
  */
-export function generateTokens(user: User): TokenPair {
-  const accessToken = jwt.sign(
-    { id: user.id, email: user.email },
-    env.JWT_SECRET,
-    { expiresIn: "15m" },
-  );
-
-  const refreshToken = jwt.sign(
-    { id: user.id },
-    env.JWT_SECRET,
-    { expiresIn: "7d" },
-  );
-
-  return { accessToken, refreshToken };
-}
-
-/**
- * Set a cookie token with secure options
- */
-export function setCookieToken(event: H3Event, name: string, value: string): void {
-  setCookie(event, name, value, {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: name === "refreshToken" ? 60 * 60 * 24 * 7 : 60 * 15, // 7 days or 15 mins
+export async function getSession(event: H3Event) {
+  const session = await auth.api.getSession({
+    headers: event.headers,
   });
+
+  if (!session) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
+  return session;
 }
 
 const rateLimitMap = new Map<string, RateLimitData>();
