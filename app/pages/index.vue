@@ -181,7 +181,10 @@ onMounted(async () => {
   <div class="flex bg-white dark:bg-zinc-900 min-h-screen">
     <!-- sidebar -->
     <div class="bg-zinc-50 dark:bg-black w-[338px] p-8 flex flex-col h-screen overflow-y-auto scrollbar">
-      <div><Logo /></div>
+      <div class="flex justify-between items-center">
+        <Logo />
+        <ThemeSwitcher />
+      </div>
       <!-- today container -->
       <div>
         <p class="text-sm font-bold text-zinc-500 dark:text-[#C2C2C5] mb-6 mt-12">

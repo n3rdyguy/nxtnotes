@@ -40,7 +40,10 @@ async function submit() {
   <div class="flex bg-white dark:bg-zinc-900 h-screen">
     <!-- sidebar -->
     <div class="bg-zinc-50 dark:bg-black w-[516px] p-16 flex flex-col justify-center">
-      <Logo />
+      <div class="flex justify-between items-center">
+        <Logo />
+        <ThemeSwitcher />
+      </div>
       <h1 class="text-zinc-900 dark:text-white font-bold text-lg mt-8">
         Log in to your account
       </h1>
