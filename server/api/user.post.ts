@@ -1,8 +1,8 @@
 import bcryptjs from "bcryptjs";
-import prisma from "~/lib/prisma";
-import { generateTokens, rateLimit, setCookieToken } from "~/server/utils/security";
-import { validateBody } from "~/server/utils/validation";
-import { registerSchema } from "~/shared/schemas/auth.schema";
+import prisma from "~~/lib/prisma";
+import { generateTokens, rateLimit, setCookieToken } from "~~/server/utils/security";
+import { validateBody } from "~~/server/utils/validation";
+import { registerSchema } from "~~/shared/schemas/auth.schema";
 
 export default defineEventHandler(async (event) => {
   try {

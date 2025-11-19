@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { env } from "~/server/utils/env";
+import { env } from "~~/server/utils/env";
 
 export default defineEventHandler((event) => {
   const csrfToken = randomBytes(32).toString("hex");

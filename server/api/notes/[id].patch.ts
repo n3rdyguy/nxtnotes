@@ -1,10 +1,10 @@
-import type { JwtPayload } from "~/shared/schemas/auth.schema";
+import type { JwtPayload } from "~~/shared/schemas/auth.schema";
 import jwt from "jsonwebtoken";
-import prisma from "~/lib/prisma";
-import { env } from "~/server/utils/env";
-import { validateBody, validateParams } from "~/server/utils/validation";
-import { jwtPayloadSchema } from "~/shared/schemas/auth.schema";
-import { noteIdParamSchema, updateNoteSchema } from "~/shared/schemas/note.schema";
+import prisma from "~~/lib/prisma";
+import { env } from "~~/server/utils/env";
+import { validateBody, validateParams } from "~~/server/utils/validation";
+import { jwtPayloadSchema } from "~~/shared/schemas/auth.schema";
+import { noteIdParamSchema, updateNoteSchema } from "~~/shared/schemas/note.schema";
 
 export default defineEventHandler(async (event) => {
   try {

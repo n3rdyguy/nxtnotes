@@ -112,8 +112,11 @@ async function deleteNote() {
 
     // Auto-select the first note (most recent) or create new one if none remain
     if (notes.value.length > 0) {
-      selectedNote.value = notes.value[0];
-      updatedNote.value = selectedNote.value.text;
+      const firstNote = notes.value[0];
+      if (firstNote) {
+        selectedNote.value = firstNote;
+        updatedNote.value = firstNote.text;
+      }
     }
     else {
       await createNewNote();
@@ -150,12 +153,18 @@ onMounted(async () => {
   notes.value = await $fetch<Note[]>("/api/notes");
 
   if (notes.value.length > 0) {
-    selectedNote.value = notes.value[0];
-    updatedNote.value = selectedNote.value.text;
+    const firstNote = notes.value[0];
+    if (firstNote) {
+      selectedNote.value = firstNote;
+      updatedNote.value = firstNote.text;
+    }
   }
   else {
     await createNewNote();
-    selectedNote.value = notes.value[0];
+    const firstNote = notes.value[0];
+    if (firstNote) {
+      selectedNote.value = firstNote;
+    }
   }
   nextTick(() => {
     noteTextarea.value?.focus();
