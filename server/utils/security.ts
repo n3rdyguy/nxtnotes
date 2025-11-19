@@ -9,7 +9,7 @@ interface RateLimitData {
 /**
  * Get the current session from BetterAuth
  */
-export async function getSession(event: H3Event) {
+export async function requireAuthSession(event: H3Event) {
   const session = await auth.api.getSession({
     headers: event.headers,
   });

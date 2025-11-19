@@ -1,10 +1,10 @@
 import prisma from "~~/lib/prisma";
-import { getSession } from "~~/server/utils/security";
+import { requireAuthSession } from "~~/server/utils/security";
 
 export default defineEventHandler(async (event) => {
   try {
     // Get session from BetterAuth
-    const session = await getSession(event);
+    const session = await requireAuthSession(event);
 
     // Create new note
     const newNote = await prisma.notes.create({

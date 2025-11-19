@@ -1,5 +1,5 @@
 import prisma from "~~/lib/prisma";
-import { getSession } from "~~/server/utils/security";
+import { requireAuthSession } from "~~/server/utils/security";
 
 /**
  * GET /api/notes
@@ -8,7 +8,7 @@ import { getSession } from "~~/server/utils/security";
 export default defineEventHandler(async (event) => {
   try {
     // Get session from BetterAuth
-    const session = await getSession(event);
+    const session = await requireAuthSession(event);
 
     // Fetch user's notes
     const notes = await prisma.notes.findMany({

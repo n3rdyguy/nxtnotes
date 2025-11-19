@@ -1,12 +1,12 @@
 import prisma from "~~/lib/prisma";
-import { getSession } from "~~/server/utils/security";
+import { requireAuthSession } from "~~/server/utils/security";
 import { validateBody, validateParams } from "~~/server/utils/validation";
 import { noteIdParamSchema, updateNoteSchema } from "~~/shared/schemas/note.schema";
 
 export default defineEventHandler(async (event) => {
   try {
     // Get session from BetterAuth
-    const session = await getSession(event);
+    const session = await requireAuthSession(event);
 
     // Validate route parameters
     const { id } = validateParams(event, noteIdParamSchema);
