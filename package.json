@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@nuxt/eslint": "^1.10.0",
+    "@nuxt/icon": "^2.1.0",
     "@prisma/client": "^6.19.0",
     "@prisma/nuxt": "^0.3.0",
     "@vueuse/core": "^14.0.0",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.10.1",
     "autoprefixer": "^10.4.22",

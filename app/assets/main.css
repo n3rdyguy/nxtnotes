@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dark .swal2-popup {
+  @apply bg-zinc-800 text-zinc-100;
+}
+.dark .swal2-title {
+  @apply text-zinc-100;
+}
+.dark .swal2-content {
+  @apply text-zinc-300;
+}
+.dark .swal2-html-container {
+  @apply text-zinc-300;
+}

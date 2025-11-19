@@ -37,30 +37,30 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex bg-zinc-900 h-screen">
+  <div class="flex bg-white dark:bg-zinc-900 h-screen">
     <!-- sidebar -->
-    <div class="bg-black w-[516px] p-16 flex flex-col justify-center">
+    <div class="bg-zinc-50 dark:bg-black w-[516px] p-16 flex flex-col justify-center">
       <Logo />
-      <h1 class="text-white font-bold text-lg mt-8">
+      <h1 class="text-zinc-900 dark:text-white font-bold text-lg mt-8">
         Log in to your account
       </h1>
-      <p class="text-zinc-300 text-sm mt-0.5 mb-12">
+      <p class="text-zinc-600 dark:text-zinc-300 text-sm mt-0.5 mb-12">
         Don't have an account?
         <NuxtLink to="/register">
-          <span class="font-bold text-[#FFAC00] underline cursor-pointer">Sign up</span>
+          <span class="font-bold text-brand underline cursor-pointer">Sign up</span>
         </NuxtLink> for one
       </p>
       <form @submit.prevent="submit">
         <div class="mb-8">
-          <label for="email" class="text-zinc-300 text-sm block mb-0.5">Email Address</label>
-          <input id="email" v-model="email" placeholder="your@email.com" type="email" name="email" autocomplete="email" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <label for="email" class="text-zinc-600 dark:text-zinc-300 text-sm block mb-0.5">Email Address</label>
+          <input id="email" v-model="email" placeholder="your@email.com" type="email" name="email" autocomplete="email" class="w-full bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-[#3F3F46] rounded text-zinc-900 dark:text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div class="mb-8">
-          <label for="password" class="text-zinc-300 text-sm block mb-0.5">Password</label>
-          <input id="password" v-model="password" placeholder="**********************" type="password" name="password" autocomplete="current-password" class="w-full bg-[#27272A] border border-[#3F3F46] rounded text-white p-2 placeholder:text-zinc-500 text-sm">
+          <label for="password" class="text-zinc-600 dark:text-zinc-300 text-sm block mb-0.5">Password</label>
+          <input id="password" v-model="password" placeholder="**********************" type="password" name="password" autocomplete="current-password" class="w-full bg-white dark:bg-[#27272A] border border-zinc-300 dark:border-[#3F3F46] rounded text-zinc-900 dark:text-white p-2 placeholder:text-zinc-500 text-sm">
         </div>
         <div>
-          <button class="flex justify-center gap-2 items-center w-full bg-[#FFAC00] rounded-full px-4 py-2">
+          <button class="flex justify-center gap-2 items-center w-full bg-brand text-white rounded-full px-4 py-2">
             Log In
             <ArrowRight />
           </button>

@@ -178,13 +178,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex bg-zinc-900 min-h-screen">
+  <div class="flex bg-white dark:bg-zinc-900 min-h-screen">
     <!-- sidebar -->
-    <div class="bg-black w-[338px] p-8 flex flex-col h-screen overflow-y-auto scrollbar">
+    <div class="bg-zinc-50 dark:bg-black w-[338px] p-8 flex flex-col h-screen overflow-y-auto scrollbar">
       <div><Logo /></div>
       <!-- today container -->
       <div>
-        <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
+        <p class="text-sm font-bold text-zinc-500 dark:text-[#C2C2C5] mb-6 mt-12">
           Today
         </p>
         <div
@@ -192,19 +192,19 @@ onMounted(async () => {
         >
           <div
             v-for="note in todaysNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
+            :class="{ 'bg-gold': selectedNote?.id === note.id,
+                      'hover:bg-gold/50': selectedNote?.id !== note.id,
             }"
             @click="selectNote(note)"
           >
-            <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 truncate">
               {{ note.text.substring(0, 40) }}
             </h3>
-            <div class="leading-none text-[#C2C2C5] truncate">
-              <span class="text-xs text-[#F4F4F5] mr-4">
+            <div class="leading-none text-zinc-500 dark:text-zinc-400 truncate">
+              <span class="text-xs text-zinc-800 dark:text-zinc-100 mr-4">
                 {{ new Date().toLocaleDateString() }}
               </span>
-              <span v-if="note.text.length > 40" class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
+              <span v-if="note.text.length > 40" class="text-xs text-zinc-500 dark:text-zinc-400">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@ onMounted(async () => {
       <!-- /today container -->
       <!-- yesterday container -->
       <div>
-        <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
+        <p class="text-sm font-bold text-zinc-500 dark:text-[#C2C2C5] mb-6 mt-12">
           Yesterday
         </p>
         <div
@@ -220,19 +220,19 @@ onMounted(async () => {
         >
           <div
             v-for="note in yesterdaysNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
+            :class="{ 'bg-gold': selectedNote?.id === note.id,
+                      'hover:bg-gold/50': selectedNote?.id !== note.id,
             }"
             @click="selectNote(note)"
           >
-            <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 truncate">
               {{ note.text.substring(0, 40) }}
             </h3>
-            <div class="leading-none text-[#C2C2C5] truncate">
-              <span class="text-xs text-[#F4F4F5] mr-4">
+            <div class="leading-none text-zinc-500 dark:text-zinc-400 truncate">
+              <span class="text-xs text-zinc-800 dark:text-zinc-100 mr-4">
                 {{ new Date(note.updated_at).toLocaleDateString() }}
               </span>
-              <span v-if="note.text.length > 40" class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
+              <span v-if="note.text.length > 40" class="text-xs text-zinc-500 dark:text-zinc-400">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -240,7 +240,7 @@ onMounted(async () => {
       <!-- /yesterday container -->
       <!-- past 30 days container -->
       <div>
-        <p class="text-sm font-bold text-[#C2C2C5] mb-6 mt-12">
+        <p class="text-sm font-bold text-zinc-500 dark:text-[#C2C2C5] mb-6 mt-12">
           Earlier
         </p>
         <div
@@ -248,19 +248,19 @@ onMounted(async () => {
         >
           <div
             v-for="note in earlierNotes" :key="note.id" class="p-2 rounded-lg cursor-pointer"
-            :class="{ 'bg-[#A1842C]': selectedNote?.id === note.id,
-                      'hover:bg-[#A1842C]/50': selectedNote?.id !== note.id,
+            :class="{ 'bg-gold': selectedNote?.id === note.id,
+                      'hover:bg-gold/50': selectedNote?.id !== note.id,
             }"
             @click="selectNote(note)"
           >
-            <h3 class="text-sm font-bold text-[#F4F4F5] truncate">
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 truncate">
               {{ note.text.substring(0, 40) }}
             </h3>
-            <div class="leading-none text-[#C2C2C5] truncate">
-              <span class="text-xs text-[#F4F4F5] mr-4">
+            <div class="leading-none text-zinc-500 dark:text-zinc-400 truncate">
+              <span class="text-xs text-zinc-800 dark:text-zinc-100 mr-4">
                 {{ new Date(note.updated_at).toLocaleDateString() }}
               </span>
-              <span class="text-xs text-[#C2C2C5]">...{{ note.text.substring(40, 90) }}</span>
+              <span class="text-xs text-zinc-500 dark:text-zinc-400">...{{ note.text.substring(40, 90) }}</span>
             </div>
           </div>
         </div>
@@ -272,31 +272,31 @@ onMounted(async () => {
     <div class="w-full flex flex-col">
       <div class="flex justify-between w-full items-start p-8">
         <button
-          class="inline-flex text-sx text-[#C2C2C5] hover:text-white items-center gap-2"
+          class="inline-flex text-sx text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white items-center gap-2"
           @click="createNewNote"
         >
           <PencilIcon />
           Create note
         </button>
-        <button class="text-[#6D6D73] hover:text-white" @click="throttledDeleteNote">
+        <button class="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white" @click="throttledDeleteNote">
           <TrashIcon />
         </button>
       </div>
       <!-- /button container -->
       <!-- note container -->
       <div class="max-w-[437px] mx-auto w-full flex-grow flex flex-col">
-        <p class="text-[#929292] playfair">
+        <p class="text-zinc-400 dark:text-zinc-500 playfair">
           {{ selectedNote?.updated_at ? new Date(selectedNote.updated_at).toLocaleDateString() : new Date().toLocaleDateString() }}
         </p>
         <textarea
           id="note"
           ref="noteTextarea"
           v-model="updatedNote" maxlength="65535" name="note"
-          class="text-[#D4D4D4] my-4 playfair note scrollbar w-full bg-transparent focus:outline-none resize-none flex-grow"
+          class="text-zinc-800 dark:text-zinc-300 my-4 playfair note scrollbar w-full bg-transparent focus:outline-none resize-none flex-grow"
           @input="debouncedUpdateNote"
         />
       </div>
-      <button class="text-zinc-400 hover:text-white text-sm font-bold absolute right-5 bottom-5" @click="logout">
+      <button class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-sm font-bold absolute right-5 bottom-5" @click="logout">
         Log Out
       </button>
     </div>

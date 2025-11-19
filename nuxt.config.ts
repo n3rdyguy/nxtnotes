@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: ["@prisma/nuxt", "@nuxt/eslint", "@vueuse/nuxt"],
+  modules: ["@prisma/nuxt", "@nuxt/eslint", "@vueuse/nuxt", "@nuxtjs/color-mode"],
 
   app: {
     baseURL: "/", // Ensures default base URL

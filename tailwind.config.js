@@ -8,8 +8,14 @@ export default {
     "./app/app.vue",
     "./app/error.vue",
   ],
+  darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        brand: "#FFAC00",
+        gold: "#A1842C",
+      },
+    },
   },
   plugins: [],
 };
