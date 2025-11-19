@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
+    "@iconify-json/tabler": "^1.2.23",
     "@nuxtjs/color-mode": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.10.1",
